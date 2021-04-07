@@ -10,7 +10,7 @@ import pickle
 from datetime import datetime
 '''ROS node for the laptop'''
 
-TRAINING = True
+TRAINING = False
 
 c_angle, c_speed, img, lscan = 0, 0, None, None
 
@@ -51,8 +51,8 @@ def laptopNode():
   global c_angle, c_speed, img, lscan
   pub = rospy.Publisher('/NN_angle_speed', String, queue_size=1)
   rospy.init_node('ros_node_laptop')
-  img_sub = rospy.Subscriber('/cv_camera/image_raw/compressed', CompressedImage, img_callback, queue_size=1)
-  #img_sub = rospy.Subscriber('/raspicam_node/image/CompressedImage', CompressedImage, img_callback)
+  #img_sub = rospy.Subscriber('/cv_camera/image_raw/compressed', CompressedImage, img_callback, queue_size=1)
+  img_sub = rospy.Subscriber('/raspicam_node/image/CompressedImage', CompressedImage, img_callback)
   car_sub = rospy.Subscriber('/car_angle_speed', String, car_callback)
   lidar_sub = rospy.Subscriber('/rplidarNode/scan', LaserScan, lidar_callback)
   
@@ -64,15 +64,16 @@ def laptopNode():
 
   while not rospy.is_shutdown():
     print(f"NN Ang: {angle}\tNN Vel: {speed}\tCar Ang: {c_angle}\tCar Vel: {c_speed}\tAng Err: {c_angle-angle}\tVel Err: {c_speed-speed}")
+
+    angle, speed = (c_angle+10)%180, 10#read_NN(img)
     
     if not TRAINING:
-      angle, speed = (c_angle+10)%180, 10#read_NN(img)
+      angle, speed = angle, speed#read_NN(img)
     else:
       #print("Training")
-      angle, speed = (c_angle+10)%180, 10#read_NN(img)
       data = {"time" : rospy.get_time(), "c_angle" : c_angle, "c_speed" : c_speed, "lscan" : lscan, "img" : img}
       pickle.dump(data,ff)
-      #print(data)
+
     pub.publish(f"{angle},{speed}")
     rate.sleep()
   

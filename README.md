@@ -29,10 +29,14 @@ On the Pi also run
 sudo systemctl disable magni-base
 ```
 
+Packages that may also need to be installed
+====
 - https://github.com/Slamtec/rplidar_ros
 - https://github.com/UbiquityRobotics/raspicam_node
+- https://pypi.org/project/pyserial/
+- https://pypi.org/project/opencv-python/
 
-
+---
 How to run merl_bot ros package
 =====================================================================
 
@@ -46,3 +50,5 @@ On the Laptop running the NN
 ```bash
 merl_bot_NN
 ```
+
+If you are recording training data, change the **`TRAINING`** variable in *ros_node_laptop.py* to be `True`. This will record the car's current angle, speed, LIDAR scan, and camera image into a pickle (**training_*MONTH*_*DAY* _*HOUR* _*MINUTE*.p**). 

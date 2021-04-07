@@ -2,4 +2,4 @@
 
 gnome-terminal -e "roslaunch raspicam_node camerav2_410x308_30fps.launch"
 gnome-terminal -e "roslaunch rplidar_ros rplidar.launch"
-gnome-terminal -e "rosrun merl_bot ros_node_pi.py"
+rosrun merl_bot ros_node_pi.py
