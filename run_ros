@@ -1,0 +1,9 @@
+#!/bin/bash
+
+gnome-terminal -e "roscore"
+sleep 2
+gnome-terminal -e "rosrun cv_camera cv_camera_node"
+sleep 2
+gnome-terminal -e "rosrun merl_bot ros_node_laptop.py"
+sleep 2
+gnome-terminal -e "rosrun merl_bot ros_node_pi.py"

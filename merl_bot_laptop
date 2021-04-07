@@ -1,0 +1,5 @@
+#!/bin/bash
+
+export ROS_MASTER_URI=http://ubiquityrobotics.local:11311
+
+gnome-terminal -e "rosrun merl_bot ros_node_laptop.py"
