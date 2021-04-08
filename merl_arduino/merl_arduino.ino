@@ -76,7 +76,7 @@ void loop() {
       readString += c; //makes the string readString
     }
   }
-  else if ( (millis()-prevTime) >= 1000) {
-    myservo.write(90);
-  }
+  // else if ( (millis()-prevTime) >= 1000) {
+  //   myservo.write(90);
+  // }
 }
