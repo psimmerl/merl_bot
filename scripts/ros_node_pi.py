@@ -30,7 +30,7 @@ def piNode():
     ser.flushOutput()
     #Read data from the Arduino
     #data = tuple(ser.readline()[:-2].decode('utf-8').split(','))
-    while ser.inWaiting(): 
+    if ser.inWaiting(): 
       data+=ser.read().decode('utf-8')
       if "*" in data:
         (c_angle, c_speed) = tuple(data[:-1].split(','))
@@ -46,7 +46,7 @@ def piNode():
       ser.write("{},{}*".format(angle,speed).encode('utf-8'))
     else:
       print "Laptop node does not exist! Stopping Robot!" 
-      ser.write('0,\t0*'.encode('utf-8'))
+      ser.write('0,0*'.encode('utf-8'))
 
     #Write the angle and speed to the Arduino
      

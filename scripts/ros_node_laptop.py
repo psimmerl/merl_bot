@@ -69,15 +69,15 @@ def laptopNode():
 
     angle, speed = (c_angle+10)%180, 10#read_NN(img)
     
-    if not TRAINING:
-      angle, speed = angle, speed#read_NN(img)
-    else:
-      print("Training")
-      # with Xbox360Controller() as cont:
-      #   angle = cont.axis_r.x
-      #   speed = cont.axis_l.y
-      data = {"time" : rospy.get_time(), "c_angle" : c_angle, "c_speed" : c_speed, "lscan" : lscan, "img" : img}
-      # pickle.dump(data,ff)
+    # if not TRAINING:
+    #   angle, speed = angle, speed#read_NN(img)
+    # else:
+    #   print("Training")
+    #   with Xbox360Controller() as cont:
+    #     angle = cont.axis_r.x
+    #     speed = cont.axis_l.y
+    #   data = {"time" : rospy.get_time(), "c_angle" : c_angle, "c_speed" : c_speed, "lscan" : lscan, "img" : img}
+    #   pickle.dump(data,ff)
 
     pub.publish(f"{angle},{speed}")
     rate.sleep()
