@@ -47,7 +47,7 @@ void loop() {
     bno.getEvent(&event);
   
     /* Display the floating point data */
-    yaw = (double) event.orientation.x-180; // 0 is straight ahead
+    yaw = (double) event.orientation.x; // 0 is straight ahead
     pitch = (double) event.orientation.y;
     roll = (double) event.orientation.z; 
     //Serial.print(String(yaw)+","+String(pitch)+"*");
