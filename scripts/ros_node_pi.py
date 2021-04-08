@@ -10,11 +10,8 @@ angle, speed = 0, 0
 
 def tv_callback(data):
   global angle, speed
-  try:
-    angle, speed = tuple(map(float, data.data.split(',')))
-  except:
-    print "Error" 
-
+  print "here"
+  angle, speed = tuple(map(float, data.data.split(',')))
 
 def piNode():
   global angle, speed
