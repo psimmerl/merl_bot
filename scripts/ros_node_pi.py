@@ -11,7 +11,8 @@ angle, speed = 0, 0
 def tv_callback(data):
   global angle, speed
   print "********************************here**********************************"
-  angle, speed = tuple(map(float, data.data.split(',')))
+  angle, speed = 10, 10
+  #angle, speed = tuple(map(float, data.data.split(',')))
 
 def piNode():
   global angle, speed
