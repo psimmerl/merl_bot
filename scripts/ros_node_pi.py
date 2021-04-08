@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import time, serial, os, rospy, rosnode
 from std_msgs.msg import String
 '''ROS node for the Raspberry Pi'''
