@@ -33,7 +33,7 @@ def piNode():
     while ser.inWaiting(): 
       data+=ser.read().decode('utf-8')
       if "*" in data:
-        (c_angle, c_speed) = tuple(data.split(','))
+        (c_angle, c_speed) = tuple(data[:-1].split(','))
         #if c_angle == '':
         #  print("************************ERROR************************")
         pub.publish( "{},{}".format(c_angle,c_speed))
