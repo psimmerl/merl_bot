@@ -21,7 +21,7 @@ def piNode():
 
   rospy.init_node('ros_node_pi') 
   pub = rospy.Publisher('/car_angle_speed', String, queue_size=1)
-  sub = rospy.Subscriber("/NN_angle_speed", String, tv_callback)
+  sub = rospy.Subscriber('/NN_angle_speed', String, tv_callback)
   
   rate = rospy.Rate(30) # 30hz
   ser.flushInput()

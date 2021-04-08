@@ -49,14 +49,14 @@ def lidar_callback(data):
 
   plt.show()
 
-angle, speed = 0, 0
-def tv_callback(data):
-  global angle, speed
-  print("********************************here**********************************")
-  angle, speed = tuple(map(float, data.data.split(',')))
+# angle, speed = 0, 0
+# def tv_callback(data):
+#   global angle, speed
+#   print("********************************here**********************************")
+#   angle, speed = tuple(map(float, data.data.split(',')))
 
 def laptopNode():
-  global angle, speed
+  # global angle, speed
   global c_angle, c_speed, img, lscan
   pub = rospy.Publisher('/NN_angle_speed', String, queue_size=1)
   rospy.init_node('ros_node_laptop')
@@ -66,7 +66,7 @@ def laptopNode():
   lidar_sub = rospy.Subscriber('/rplidarNode/scan', LaserScan, lidar_callback)
   
   
-  dumb_sub = rospy.Subscriber('/NN_angle_speed', String, tv_callback)
+  # dumb_sub = rospy.Subscriber('/NN_angle_speed', String, tv_callback)
   
   rate = rospy.Rate(30) # 30 hz
   angle, speed = 0, 0
