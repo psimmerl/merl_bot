@@ -22,31 +22,35 @@ def piNode():
   pub = rospy.Publisher('/car_angle_speed', String, queue_size=1)
   sub = rospy.Subscriber("/NN_angle_speed", String, tv_callback)
   
-  rate = rospy.Rate(30) # 10hz
+  rate = rospy.Rate(30) # 30hz
+  ser.flushInput()
 
+  data = ""
   while not rospy.is_shutdown(): 
     ser.flushOutput()
     #Read data from the Arduino
     data = tuple(ser.readline()[:-2].decode('utf-8').split(','))
-    if len(data) > 1 :
-
-      (c_angle, c_speed) = data
-      #if c_angle == '':
-      #  print("************************ERROR************************")
-      pub.publish( "{},{}".format(c_angle,c_speed))
-      print "{},{}".format(c_angle,c_speed)
+    while ser.inWaiting():
+      data+=ser.read().decode('utf-8')
+      if "*" in data:
+        (c_angle, c_speed) = tuple(data.split(','))
+        #if c_angle == '':
+        #  print("************************ERROR************************")
+        pub.publish( "{},{}".format(c_angle,c_speed))
+        print "Serial:\t{},\t{}".format(c_angle,c_speed)
+        data = ""
 
     #Read the angle and speed from the neural network using the ros_node_laptop topic
     if "/ros_node_laptop" in rosnode.get_node_names():
-      #print(f"Callback: {angle},\t{speed}")
+      print "Callback:\t{},\t{}".format(angle,speed)
       ser.write("{},{}*".format(angle,speed).encode('utf-8'))
     else:
       print "Laptop node does not exist! Stopping Robot!" 
-      ser.write('0,0*'.encode('utf-8'))
+      ser.write('0,\t0*'.encode('utf-8'))
 
     #Write the angle and speed to the Arduino
      
-    ser.flushInput()
+    # ser.flushInput()
     rate.sleep()
 
   ser.close()
