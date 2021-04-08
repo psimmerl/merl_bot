@@ -53,7 +53,6 @@ def lidar_callback(data):
 angle, speed = 0, 0
 def tv_callback(data):
   global angle, speed
-  print("********************************here**********************************")
   angle, speed = tuple(map(float, data.data.split(',')))
 
 def laptopNode():
