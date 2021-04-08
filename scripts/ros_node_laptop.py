@@ -74,7 +74,7 @@ def laptopNode():
   
   dumb_sub = rospy.Subscriber('/NN_angle_speed', String, tv_callback)
   
-  rate = rospy.Rate(30) # 60 hz
+  rate = rospy.Rate(15) # 60 hz
 
   # if TRAINING:
   #   ff = open(f"training_{datetime.now().strftime('%m_%d_%H_%M')}.p",'wb')
@@ -84,7 +84,7 @@ def laptopNode():
 
     
     if not TRAINING:
-      angle, speed = c_angle, (c_speed)%180#read_NN(img)
+      angle, speed = c_angle%180, (c_speed)%180#read_NN(img)
     else:
       print("Training")
       # with Xbox360Controller(0, axis_threshold=0.2) as controller:
