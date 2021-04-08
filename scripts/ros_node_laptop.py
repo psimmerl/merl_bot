@@ -8,6 +8,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pickle
 from datetime import datetime
+
+# import signal
+# from xbox360controller import Xbox360Controller
 '''ROS node for the laptop'''
 
 TRAINING = False
@@ -28,10 +31,10 @@ def img_callback(data):
 def car_callback(data):
   global c_angle, c_speed
   try:
-    c_angle, c_speed = map(int, data.data.split(','))
+    c_angle, c_speed = map(float, data.data.split(','))
   except: #I don't know why this is happening - "c_angle == ''""
-    pass
-    #print(f"Can't convert to int: {data.data.split(',')}")
+    #pass
+    print(f"Can't convert to int: {data.data.split(',')}")
 
 def lidar_callback(data):
   global lscan
@@ -46,12 +49,11 @@ def lidar_callback(data):
 
   plt.show()
 
-
 def laptopNode():
   global c_angle, c_speed, img, lscan
   pub = rospy.Publisher('/NN_angle_speed', String, queue_size=1)
   rospy.init_node('ros_node_laptop')
-  #img_sub = rospy.Subscriber('/cv_camera/image_raw/compressed', CompressedImage, img_callback, queue_size=1)
+  # img_sub = rospy.Subscriber('/cv_camera/image_raw/compressed', CompressedImage, img_callback, queue_size=1)
   img_sub = rospy.Subscriber('/raspicam_node/image/CompressedImage', CompressedImage, img_callback)
   car_sub = rospy.Subscriber('/car_angle_speed', String, car_callback)
   lidar_sub = rospy.Subscriber('/rplidarNode/scan', LaserScan, lidar_callback)
@@ -59,9 +61,9 @@ def laptopNode():
   rate = rospy.Rate(30) # 30 hz
   angle, speed = 0, 0
 
-  if TRAINING:
-    ff = open(f"training_{datetime.now().strftime('%m_%d_%H_%M')}.p",'wb')
-
+  # if TRAINING:
+  #   ff = open(f"training_{datetime.now().strftime('%m_%d_%H_%M')}.p",'wb')
+    
   while not rospy.is_shutdown():
     print(f"NN Ang: {angle}\tNN Vel: {speed}\tCar Ang: {c_angle}\tCar Vel: {c_speed}\tAng Err: {c_angle-angle}\tVel Err: {c_speed-speed}")
 
@@ -70,14 +72,17 @@ def laptopNode():
     if not TRAINING:
       angle, speed = angle, speed#read_NN(img)
     else:
-      #print("Training")
+      print("Training")
+      # with Xbox360Controller() as cont:
+      #   angle = cont.axis_r.x
+      #   speed = cont.axis_l.y
       data = {"time" : rospy.get_time(), "c_angle" : c_angle, "c_speed" : c_speed, "lscan" : lscan, "img" : img}
-      pickle.dump(data,ff)
+      # pickle.dump(data,ff)
 
     pub.publish(f"{angle},{speed}")
     rate.sleep()
   
-  ff.close()
+  # ff.close()
 
 if __name__ == '__main__':
   print("Starting MERL Bot Laptop Node")
