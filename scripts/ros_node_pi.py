@@ -35,13 +35,14 @@ def piNode():
       data+=ser.read().decode('utf-8')
       if "*" in data:
         try:
-          (c_angle, c_speed) = tuple(data.replace('*','').split(','))
+          print data
+          (c_angle, c_speed) = 0,0#tuple(data.replace('*','').split(','))
           #if c_angle == '':
           #  print("************************ERROR************************")
           pub.publish( "{},{}".format(c_angle,c_speed))
           print "Serial:\t{},\t{}".format(c_angle,c_speed)
         except: 
-          pass
+          ser.flushOutput()
         data = ""
 
     #Read the angle and speed from the neural network using the ros_node_laptop topic
