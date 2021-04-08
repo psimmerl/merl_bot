@@ -47,7 +47,7 @@ def piNode():
 
     #Read the angle and speed from the neural network using the ros_node_laptop topic
     if "/ros_node_laptop" in rosnode.get_node_names():
-      print "Callback:\t{},\t{}".format(angle,speed)
+      # print "Callback:\t{},\t{}".format(angle,speed)
       ser.write("{},{}*".format(angle,speed).encode('utf-8'))
     else:
       print "Laptop node does not exist! Stopping Robot!" 
