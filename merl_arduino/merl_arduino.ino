@@ -50,7 +50,7 @@ void loop() {
     yaw = (double) event.orientation.x-180; // 0 is straight ahead
     pitch = (double) event.orientation.y;
     roll = (double) event.orientation.z; 
-    Serial.print(String(yaw)+","+String(pitch)+"*");
+    //Serial.print(String(yaw)+","+String(pitch)+"*");
   }
   
   
@@ -65,8 +65,9 @@ void loop() {
       angle = s_angle.toDouble();
       speed1 = s_speed1.toDouble();
             
-      //Serial.print(String(angle)+","+String(speed1)+"*");
       myservo.write(angle);
+      Serial.print(String(angle)+","+String(speed1)+String(yaw)+","+String(pitch)+"*");
+
   
       readString=""; //clears variable for new input
       //angle="";
