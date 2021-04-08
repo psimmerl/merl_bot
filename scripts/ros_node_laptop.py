@@ -67,7 +67,7 @@ def laptopNode():
   while not rospy.is_shutdown():
     print(f"NN Ang: {round(angle,2)}\tNN Vel: {round(speed,2)}\tCar Ang: {round(c_angle,2)}\tCar Vel: {round(c_speed,2)}\tAng Err: {round(c_angle-angle,2)}\tVel Err: {round(c_speed-speed,2)}")
 
-    angle, speed = (c_angle+10)%180, 10#read_NN(img)
+    angle, speed = ((c_angle+10)/2)%180, (c_speed-10)%180#read_NN(img)
     
     # if not TRAINING:
     #   angle, speed = angle, speed#read_NN(img)
