@@ -1,5 +1,6 @@
 #!/bin/bash
 
 export ROS_MASTER_URI=http://Team2107.local:11311
+export ROS_IP=10.42.0.59
 
 rosrun merl_bot ros_node_laptop.py
