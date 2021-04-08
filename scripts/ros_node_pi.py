@@ -29,8 +29,8 @@ def piNode():
   while not rospy.is_shutdown(): 
     ser.flushOutput()
     #Read data from the Arduino
-    data = tuple(ser.readline()[:-2].decode('utf-8').split(','))
-    while ser.inWaiting():
+    #data = tuple(ser.readline()[:-2].decode('utf-8').split(','))
+    while ser.inWaiting(): 
       data+=ser.read().decode('utf-8')
       if "*" in data:
         (c_angle, c_speed) = tuple(data.split(','))
