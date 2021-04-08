@@ -66,7 +66,7 @@ void loop() {
       speed1 = s_speed1.toDouble();
             
       myservo.write(angle);
-      Serial.print(String(angle)+","+String(speed1)+String(yaw)+","+String(pitch)+"*");
+      Serial.print(String(angle)+","+String(speed1)+","+String(yaw)+","+String(pitch)+"*");
 
   
       readString=""; //clears variable for new input

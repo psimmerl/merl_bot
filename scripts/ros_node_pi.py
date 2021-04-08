@@ -36,7 +36,7 @@ def piNode():
       if "*" in data:
         try:
           print data
-          (c_angle, c_speed) = 0,0#tuple(data.replace('*','').split(','))
+          (_, __, c_angle, c_speed) = tuple(data.replace('*','').split(','))
           #if c_angle == '':
           #  print("************************ERROR************************")
           pub.publish( "{},{}".format(c_angle,c_speed))
