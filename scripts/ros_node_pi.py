@@ -40,7 +40,7 @@ def piNode():
           #if c_angle == '':
           #  print("************************ERROR************************")
           pub.publish( "{},{}".format(c_angle,c_speed))
-          print "Serial:\t{},\t{}".format(c_angle,c_speed)
+          # print "Serial:\t{},\t{}".format(c_angle,c_speed)
         except: 
           ser.flushOutput()
         data = ""
