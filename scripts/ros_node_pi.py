@@ -33,7 +33,7 @@ def piNode():
     #ser.flushOutput()
     #Read data from the Arduino
     #data = tuple(ser.readline()[:-2].decode('utf-8').split(','))
-    if ser.inWaiting(): 
+    while ser.inWaiting(): 
       data+=ser.read().decode('utf-8')
       if "*" in data:
         (c_angle, c_speed) = tuple(data.replace('*','').split(','))
