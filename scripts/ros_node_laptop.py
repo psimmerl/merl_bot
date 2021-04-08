@@ -68,7 +68,7 @@ def laptopNode():
   
   dumb_sub = rospy.Subscriber('/NN_angle_speed', String, tv_callback)
   
-  rate = rospy.Rate(30) # 30 hz
+  rate = rospy.Rate(60) # 60 hz
   angle, speed = 0, 0
 
   # if TRAINING:
