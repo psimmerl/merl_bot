@@ -34,11 +34,14 @@ def piNode():
     while ser.inWaiting(): 
       data+=ser.read().decode('utf-8')
       if "*" in data:
-        (c_angle, c_speed) = tuple(data.replace('*','').split(','))
-        #if c_angle == '':
-        #  print("************************ERROR************************")
-        pub.publish( "{},{}".format(c_angle,c_speed))
-        print "Serial:\t{},\t{}".format(c_angle,c_speed)
+        try:
+          (c_angle, c_speed) = tuple(data.replace('*','').split(','))
+          #if c_angle == '':
+          #  print("************************ERROR************************")
+          pub.publish( "{},{}".format(c_angle,c_speed))
+          print "Serial:\t{},\t{}".format(c_angle,c_speed)
+        except: 
+          pass
         data = ""
 
     #Read the angle and speed from the neural network using the ros_node_laptop topic
