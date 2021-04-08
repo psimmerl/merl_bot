@@ -61,15 +61,14 @@ def laptopNode():
   pub = rospy.Publisher('/NN_angle_speed', String, queue_size=1)
   rospy.init_node('ros_node_laptop')
   # img_sub = rospy.Subscriber('/cv_camera/image_raw/compressed', CompressedImage, img_callback, queue_size=1)
-  img_sub = rospy.Subscriber('/raspicam_node/image/compressed', CompressedImage, img_callback)
+  //img_sub = rospy.Subscriber('/raspicam_node/image/compressed', CompressedImage, img_callback)
   car_sub = rospy.Subscriber('/car_angle_speed', String, car_callback)
-  lidar_sub = rospy.Subscriber('/rplidarNode/scan', LaserScan, lidar_callback)
+  #lidar_sub = rospy.Subscriber('/rplidarNode/scan', LaserScan, lidar_callback)
   
   
   dumb_sub = rospy.Subscriber('/NN_angle_speed', String, tv_callback)
   
-  rate = rospy.Rate(60) # 60 hz
-  angle, speed = 0, 0
+  rate = rospy.Rate(30) # 60 hz
 
   # if TRAINING:
   #   ff = open(f"training_{datetime.now().strftime('%m_%d_%H_%M')}.p",'wb')
