@@ -10,8 +10,6 @@ import matplotlib.pyplot as plt
 import pickle
 from datetime import datetime
 
-# import signal
-# from xbox360controller import Xbox360Controller
 '''ROS node for the laptop'''
 
 TRAINING = False
@@ -55,13 +53,21 @@ def tv_callback(data):
   global angle, speed
   angle, speed = tuple(map(float, data.data.split(',')))
 
+# import signal
+# from xbox360controller import Xbox360Controller
+# def on_axis_moved(axis):
+#     global angle, speed
+#     angle, speed = (axis.x+1)*90, axis.y
+#     # print('Axis {0} moved to {1} {2}'.format(axis.name, axis.x, axis.y))
+
+
 def laptopNode():
   global angle, speed
   global c_angle, c_speed, img, lscan
   pub = rospy.Publisher('/NN_angle_speed', String, queue_size=1)
   rospy.init_node('ros_node_laptop')
   # img_sub = rospy.Subscriber('/cv_camera/image_raw/compressed', CompressedImage, img_callback, queue_size=1)
-  //img_sub = rospy.Subscriber('/raspicam_node/image/compressed', CompressedImage, img_callback)
+  # img_sub = rospy.Subscriber('/raspicam_node/image/compressed', CompressedImage, img_callback)
   car_sub = rospy.Subscriber('/car_angle_speed', String, car_callback)
   #lidar_sub = rospy.Subscriber('/rplidarNode/scan', LaserScan, lidar_callback)
   
@@ -76,15 +82,13 @@ def laptopNode():
   while not rospy.is_shutdown():
     print(f"NN Ang: {round(angle,2)}\tNN Vel: {round(speed,2)}\tCar Ang: {round(c_angle,2)}\tCar Vel: {round(c_speed,2)}\tAng Err: {round(c_angle-angle,2)}\tVel Err: {round(c_speed-speed,2)}")
 
-    angle, speed = (c_angle/2)%180, (c_speed)%180#read_NN(img)
     
-    # if not TRAINING:
-    #   angle, speed = angle, speed#read_NN(img)
-    # else:
-    #   print("Training")
-    #   with Xbox360Controller() as cont:
-    #     angle = cont.axis_r.x
-    #     speed = cont.axis_l.y
+    if not TRAINING:
+      angle, speed = c_angle, (c_speed)%180#read_NN(img)
+    else:
+      print("Training")
+      # with Xbox360Controller(0, axis_threshold=0.2) as controller:
+      #   controller.axis_r.when_moved = on_axis_moved
     #   data = {"time" : rospy.get_time(), "c_angle" : c_angle, "c_speed" : c_speed, "lscan" : lscan, "img" : img}
     #   pickle.dump(data,ff)
 

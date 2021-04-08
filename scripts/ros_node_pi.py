@@ -3,7 +3,7 @@ import time, serial, os, rospy, rosnode
 from std_msgs.msg import String
 '''ROS node for the Raspberry Pi'''
 
-ARDUINO_PORT = '/dev/ttyUSB0'
+ARDUINO_PORT = '/dev/ttyACM0'
 ARDUINO_BAUD_RATE = 9600
 SERIAL_TIMEOUT = 0.01
 
