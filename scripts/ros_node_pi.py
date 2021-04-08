@@ -33,15 +33,15 @@ def piNode():
       (c_angle, c_speed) = data
       #if c_angle == '':
       #  print("************************ERROR************************")
-      pub.publish(f"{c_angle},{c_speed}")
-      print(f"{c_angle},{c_speed}")
+      pub.publish( "{},{}".format(c_angle,c_speed))
+      print "{},{}".format(c_angle,c_speed)
 
     #Read the angle and speed from the neural network using the ros_node_laptop topic
     if "/ros_node_laptop" in rosnode.get_node_names():
       #print(f"Callback: {angle},\t{speed}")
-      ser.write(bytes(f'{angle},{speed}*', 'utf-8'))
+      ser.write(bytes("{},{}*".format(angle,speed), 'utf-8'))
     else:
-      print("Laptop node does not exist! Stopping Robot!")
+      print "Laptop node does not exist! Stopping Robot!" 
       ser.write(bytes('0,0*', 'utf-8'))
 
     #Write the angle and speed to the Arduino
@@ -52,7 +52,7 @@ def piNode():
   ser.close()
 
 if __name__ == '__main__':
-  print("Starting MERL Bot Raspberry Pi Node")
+  print "Starting MERL Bot Raspberry Pi Node"
   try:
     piNode()
   except rospy.ROSInterruptException:

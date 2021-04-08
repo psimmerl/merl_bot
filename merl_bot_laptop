@@ -1,5 +1,5 @@
 #!/bin/bash
 
-export ROS_MASTER_URI=http://ubiquityrobotics.local:11311
+export ROS_MASTER_URI=http://Team2107.local:11311
 
 rosrun merl_bot ros_node_laptop.py
