@@ -1,11 +1,10 @@
 #!/usr/bin/env python
-import time, os, rospy, cv2
+import time, os, rospy, rosnode, cv2
 from std_msgs.msg import String
 from sensor_msgs.msg import CompressedImage, LaserScan
 from cv_bridge import CvBridge, CvBridgeError
-from math import floor
-from random import randint
-import numpy as np
+# from math import floor
+# import numpy as np
 # import matplotlib.pyplot as plt
 import pickle
 from datetime import datetime
@@ -35,31 +34,35 @@ def car_callback(data):
     #pass
     print(f"Can't convert to int: {data.data.split(',')}")
 
-def lidar_callback(data):
-  global lscan
-  lscan = data.ranges
+# def lidar_callback(data):
+#   global lscan
+#   lscan = data.ranges
 
-  # fig = plt.figure(1)
-  # ax = plt.subplot(111, projection='polar')
-  # line = ax.scatter(np.linspace(0, 360, len(lscan)), lscan, s=5, c=[0, 50],
-  #                         cmap=plt.cm.Greys_r, lw=0)
-  # ax.set_rmax(4000)
-  # ax.grid(True)
+#   fig = plt.figure(1)
+#   ax = plt.subplot(111, projection='polar')
+#   line = ax.scatter(np.linspace(0, 360, len(lscan)), lscan, s=5, c=[0, 50],
+#                           cmap=plt.cm.Greys_r, lw=0)
+#   ax.set_rmax(4000)
+#   ax.grid(True)
 
-  # plt.show()
+#   plt.show()
 
 def laptopNode():
   global c_angle, c_speed, img, lscan
+  print("h1")
   rospy.init_node('ros_node_laptop')
-
+  print("h2")
   pub = rospy.Publisher('/NN_angle_speed', String, queue_size=1)
+  print("h2.1")
   img_sub = rospy.Subscriber('/raspicam_node/image/compressed', CompressedImage, img_callback)
+  print("h2.2")
   car_sub = rospy.Subscriber('/car_angle_speed', String, car_callback)
-  lidar_sub = rospy.Subscriber('/rplidarNode/scan', LaserScan, lidar_callback)
-
-  rate = rospy.Rate(60) # 60 hz
-  controller = Xbox360Controller()
-
+  # lidar_sub = rospy.Subscriber('/rplidarNode/scan', LaserScan, lidar_callback)
+  print("h3")
+  rate = rospy.Rate(30) # 30 hz
+  if TRAINING:
+    controller = Xbox360Controller()
+  print("h4")
   while not rospy.is_shutdown():
     if not TRAINING:
       angle, speed = 0, 0#read_NN(img)
@@ -78,6 +81,8 @@ def laptopNode():
     pub.publish(f"{angle},{speed}")
     print(f"NN Ang: {round(angle,2)}\tNN Vel: {round(speed,2)}\tCar Ang: {round(c_angle,2)}\tCar Vel: {round(c_speed,2)}\tAng Err: {round(c_angle-angle,2)}\tVel Err: {round(c_speed-speed,2)}")
     rate.sleep()
+  if TRAINING:
+    controller.close()
   
 if __name__ == '__main__':
   print("Starting MERL Bot Laptop Node")

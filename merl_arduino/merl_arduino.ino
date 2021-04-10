@@ -20,6 +20,10 @@ double roll = 0, pitch = 0, yaw = 0;
 unsigned long prevTime = millis();
 unsigned long prevBNOTime = millis();
 
+double mymap(double x, double in_min, double in_max,  double out_min, double out_max) {
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
 
 void setup() {
   Serial.begin(9600);
@@ -34,12 +38,12 @@ void setup() {
   delay(200);
   // bno.setExtCrystalUse(true);
   
-  steer.attach(9);  // attaches the servo on pin 9 to the servo object
+  steer.attach(9);
   motor.attach(10);
-  //steer.writeMicroseconds(1500);
-  //motor.writeMicroseconds(1500);
-  steer.write(90);
-  motor.write(90);
+  steer.writeMicroseconds(1500);
+  motor.writeMicroseconds(1500);
+  //steer.write(90);
+  //motor.write(90);
 }
 
 void loop() {
@@ -69,11 +73,11 @@ void loop() {
       angle = s_angle.toFloat();
       speed1 = s_speed1.toFloat();
             
-      //steer.writeMicroseconds(map(angle, -1, 1, 2000, 1000));
-      //motor.writeMicroseconds(map(speed1, -1, 1, 2000, 1000);
-      steer.write(map(angle, -1.0, 1.0, 180.0, 0.0));
-      motor.write(map(speed1, -1.0, 1.0, 180.0, 0.0));
-      Serial.print(String(angle)+","+String(speed1)+","+String(yaw)+","+String(pitch)+"*");
+      steer.writeMicroseconds(mymap(angle, -1, 1, 2000, 1000));
+      motor.writeMicroseconds(mymap(speed1, -1, 1, 2000, 1000));
+      //steer.write(mymap(angle, -1.0, 1.0, 180.0, 0.0));
+      //motor.write(mymap(speed1, -1.0, 1.0, 180.0, 0.0));
+      Serial.print(String(angle)+","+String(speed1)+","+String(2)+","+String(3)+","+String(yaw)+","+String(pitch)+"*");
       //Serial.print(s_angle+","+s_speed1+","+String(yaw)+","+String(pitch)+"*");
 
   
@@ -85,10 +89,10 @@ void loop() {
       readString += c; //makes the string readString
     }
   }
-  /*else if ( (millis()-prevTime) >= 1000) {
-    //steer.writeMicroseconds(1500);
-    //motor.writeMicroseconds(1500);
-    steer.write(90);
-    motor.write(90);
-  }*/
+  else if ( (millis()-prevTime) >= 1000) {
+    steer.writeMicroseconds(1500);
+    motor.writeMicroseconds(1500);
+    //steer.write(90);
+    //motor.write(90);
+  }
 }
