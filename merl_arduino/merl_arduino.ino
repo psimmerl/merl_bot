@@ -4,18 +4,19 @@
 #include <utility/imumaths.h>
 
 /* Set the delay between fresh samples */
-// #define BNO055_SAMPLERATE_DELAY_MS (100)
-// Adafruit_BNO055 bno = Adafruit_BNO055(55);
+const int BNO055_SAMPLERATE_DELAY_MS = 100;
+Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 
 Servo steer;
 Servo motor;
 
 String readString; //main captured String
-float angle; //data String
-float speed1;
+float angleIn; //data String
+float speedIn;
 int ind; // , locations
-double roll = 0, pitch = 0, yaw = 0;
+double yaw = 0;//, pitch = 0, roll = 0;
+sensors_event_t event;
 
 unsigned long prevTime = millis();
 unsigned long prevBNOTime = millis();
@@ -29,37 +30,37 @@ void setup() {
   Serial.begin(9600);
 
   /* Initialise the sensor */
-  // if(!bno.begin()) {
-  //   /* There was a problem detecting the BNO055 ... check your connections */
-  //   Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
-  //   while(1);
-  // }
+  if(!bno.begin()) {
+    /* There was a problem detecting the BNO055 ... check your connections */
+    Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+    while(1);
+  }
  
   delay(200);
-  // bno.setExtCrystalUse(true);
+  bno.setExtCrystalUse(true);
   
   steer.attach(9);
   motor.attach(10);
   steer.writeMicroseconds(1500);
   motor.writeMicroseconds(1500);
-  //steer.write(90);
-  //motor.write(90);
 }
 
 void loop() {
-
-  // if (prevBNOTime - millis() >= BNO055_SAMPLERATE_DELAY_MS ) {
-  //   prevBNOTime = millis();
-  //   /* Get a new sensor event */
-  //   sensors_event_t event;
-  //   bno.getEvent(&event);
+  if ((millis() - prevBNOTime) >= BNO055_SAMPLERATE_DELAY_MS ) {
+    prevBNOTime = millis();
+    /* Get a new sensor event */
+    bno.getEvent(&event);
   
-  //   /* Display the floating point data */
-  //   yaw = (double) event.orientation.x; // 0 is straight ahead
-  //   pitch = (double) event.orientation.y;
-  //   roll = (double) event.orientation.z; 
-  //   //Serial.print(String(yaw)+","+String(pitch)+"*");
-  // }
+    /* Display the floating point data */
+    yaw =(double) event.orientation.x; // 0 is straight ahead
+    if ( yaw > 180 ) {
+      yaw = mymap(yaw, 180, 360, -2, 0);//car turned 90 left is -1
+    }
+    else {
+      yaw = mymap(yaw, 0, 180, 0, 2);//car turned 90 right is -1
+    }
+    //pitch = (double) event.orientation.y; roll = (double) event.orientation.z; 
+  }
   
   
   //expect a string like 90,10*
@@ -68,22 +69,19 @@ void loop() {
     char c = Serial.read();  //gets one byte from serial buffer
     if (c == '*') {
       ind = readString.indexOf(',');  //finds location of first
-      String s_angle = readString.substring(0, ind);   //captures first data String
-      String s_speed1 = readString.substring(ind+1);   //captures second data String
-      angle = s_angle.toFloat();
-      speed1 = s_speed1.toFloat();
+      String s_angleIn = readString.substring(0, ind);   //captures first data String
+      String s_speedIn = readString.substring(ind+1);   //captures second data String
+      angleIn = s_angleIn.toFloat();
+      speedIn = s_speedIn.toFloat();
             
-      steer.writeMicroseconds(mymap(angle, -1, 1, 2000, 1000));
-      motor.writeMicroseconds(mymap(speed1, -1, 1, 2000, 1000));
-      //steer.write(mymap(angle, -1.0, 1.0, 180.0, 0.0));
-      //motor.write(mymap(speed1, -1.0, 1.0, 180.0, 0.0));
-      Serial.print(String(angle)+","+String(speed1)+","+String(2)+","+String(3)+","+String(yaw)+","+String(pitch)+"*");
-      //Serial.print(s_angle+","+s_speed1+","+String(yaw)+","+String(pitch)+"*");
-
+      steer.writeMicroseconds(mymap(angleIn, -1, 1, 2000, 1000));
+      motor.writeMicroseconds(mymap(speedIn, -1, 1, 2000, 1000));
+      int lenc = 2;
+      int renc = 3;
+      double speed = (lenc + renc) / 2.0; 
+      Serial.print(String(angleIn)+","+String(speedIn)+","+String(lenc)+","+String(renc)+","+String(yaw)+","+String(speed)+"*");
   
       readString=""; //clears variable for new input
-      //angle="";
-      //speed1="";
     } 
     else {     
       readString += c; //makes the string readString
@@ -92,7 +90,5 @@ void loop() {
   else if ( (millis()-prevTime) >= 1000) {
     steer.writeMicroseconds(1500);
     motor.writeMicroseconds(1500);
-    //steer.write(90);
-    //motor.write(90);
   }
 }

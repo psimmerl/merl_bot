@@ -59,7 +59,7 @@ def laptopNode():
   car_sub = rospy.Subscriber('/car_angle_speed', String, car_callback)
   # lidar_sub = rospy.Subscriber('/rplidarNode/scan', LaserScan, lidar_callback)
   print("h3")
-  rate = rospy.Rate(30) # 30 hz
+  rate = rospy.Rate(60) # 30 hz
   if TRAINING:
     controller = Xbox360Controller()
   print("h4")
