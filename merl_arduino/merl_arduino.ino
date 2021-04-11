@@ -7,9 +7,17 @@
 const int BNO055_SAMPLERATE_DELAY_MS = 100;
 Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
+Servo throttle;
+Servo steering;
+const byte steeringPin = 5;
+const byte throttlePin = 6;
 
-Servo steer;
-Servo motor;
+const byte leftEnc = 2;
+const byte rightEnc = 3;
+volatile int countLeft = 0;
+volatile int countRight = 0;
+int prevCount = 0;
+double speed = 0;
 
 String readString; //main captured String
 float angleIn; //data String
@@ -20,11 +28,18 @@ sensors_event_t event;
 
 unsigned long prevTime = millis();
 unsigned long prevBNOTime = millis();
+unsigned long prevEncTime = millis();
 
 double mymap(double x, double in_min, double in_max,  double out_min, double out_max) {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
+void leftISR() {
+  countLeft++;
+}
+void rightISR(){
+  countRight++;
+}
 
 void setup() {
   Serial.begin(9600);
@@ -39,10 +54,16 @@ void setup() {
   delay(200);
   bno.setExtCrystalUse(true);
   
-  steer.attach(9);
-  motor.attach(10);
-  steer.writeMicroseconds(1500);
-  motor.writeMicroseconds(1500);
+  pinMode(leftEnc, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(leftEnc), leftISR, CHANGE);
+
+  pinMode(rightEnc, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(rightEnc), rightISR, CHANGE);
+
+  steering.attach(steeringPin, 1000, 2000);
+  throttle.attach(throttlePin, 1000, 2000);
+  steering.writeMicroseconds(1500);
+  throttle.writeMicroseconds(1500);
 }
 
 void loop() {
@@ -60,8 +81,14 @@ void loop() {
       yaw = mymap(yaw, 0, 180, 0, 2);//car turned 90 right is -1
     }
     //pitch = (double) event.orientation.y; roll = (double) event.orientation.z; 
+    yaw = -yaw;
   }
   
+  if ((millis() - prevEncTime) >= 20) {
+    speed = ((countLeft+countRight-prevCount)/2)/(millis()-prevEncTime);
+    prevCount=countLeft+countRight;
+    prevEncTime = millis();
+  }
   
   //expect a string like 90,10*
   if (Serial.available())  {
@@ -71,15 +98,13 @@ void loop() {
       ind = readString.indexOf(',');  //finds location of first
       String s_angleIn = readString.substring(0, ind);   //captures first data String
       String s_speedIn = readString.substring(ind+1);   //captures second data String
-      angleIn = s_angleIn.toFloat();
-      speedIn = s_speedIn.toFloat();
-            
-      steer.writeMicroseconds(mymap(angleIn, -1, 1, 2000, 1000));
-      motor.writeMicroseconds(mymap(speedIn, -1, 1, 2000, 1000));
-      int lenc = 2;
-      int renc = 3;
-      double speed = (lenc + renc) / 2.0; 
-      Serial.print(String(angleIn)+","+String(speedIn)+","+String(lenc)+","+String(renc)+","+String(yaw)+","+String(speed)+"*");
+      angleIn = mymap(s_angleIn.toFloat(), -1, 1, 2000, 1000);
+      speedIn = mymap(s_speedIn.toFloat(), -1, 1, 2000, 1000);
+
+      steering.writeMicroseconds(angleIn);
+      throttle.writeMicroseconds(speedIn);
+
+      Serial.print(String(angleIn)+","+String(speedIn)+","+String(countLeft)+","+String(countRight)+","+String(yaw)+","+String(speed)+"*");
   
       readString=""; //clears variable for new input
     } 
@@ -88,7 +113,7 @@ void loop() {
     }
   }
   else if ( (millis()-prevTime) >= 1000) {
-    steer.writeMicroseconds(1500);
-    motor.writeMicroseconds(1500);
+    steering.writeMicroseconds(1500);
+    throttle.writeMicroseconds(1500);
   }
 }
