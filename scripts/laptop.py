@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import time, os, rospy, rosnode, cv2
 from std_msgs.msg import String
 from sensor_msgs.msg import CompressedImage, LaserScan
@@ -26,11 +26,11 @@ def img_callback(data):
   global img
   br = CvBridge()
   try:
-    img = br.compressed_imgmsg_to_cv2(data, "bgr8")
+    img = cv2.rotate(br.compressed_imgmsg_to_cv2(data, "bgr8"), cv2.ROTATE_180)
   except CvBridgeError as e:
     print(e)
-  cv2.imshow('raspicam', img)
-  cv2.waitKey(1)
+  # cv2.imshow('raspicam', img)
+  # cv2.waitKey(1)
 
 def car_callback(data):
   global c_angle, c_speed
@@ -66,7 +66,7 @@ def laptopNode():
   car_sub = rospy.Subscriber('/car_angle_speed', String, car_callback)
   # lidar_sub = rospy.Subscriber('/rplidarNode/scan', LaserScan, lidar_callback)
   print("h3")
-  rate = rospy.Rate(60) # 30 hz
+  rate = rospy.Rate(45) # 30 hz
   if TRAINING:
     xbox = Xbox360Controller()
   print("h4")
@@ -83,7 +83,8 @@ def laptopNode():
     else:
       angle = xbox.axis_l.x if abs(xbox.axis_l.x) > 0.15 else 0
       speed = xbox.trigger_r.value-xbox.trigger_l.value if abs(xbox.trigger_r.value-xbox.trigger_l.value) > 0.075 else 0
-      speed = -1* speed/2
+      
+      speed = -1* speed / 4
       # with open(f"training_{fname}.p",'a') as ff:
       #   pngname = {datetime.now().strftime('%m_%d_%H_%M_%S')}
       #   data = {"time" : rospy.get_time(), "c_angle" : c_angle, "c_speed" : c_speed, \

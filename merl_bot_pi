@@ -1,5 +1,10 @@
 #!/bin/bash
 
-gnome-terminal -e "roslaunch raspicam_node camerav2_410x308_30fps.launch"
-gnome-terminal -e "roslaunch rplidar_ros rplidar.launch"
+rosnode kill /roscore
+
+export ROS_MASTER_URI=http://psimmerl:11311
+export ROS_IP=10.42.0.1
+
+roslaunch raspicam_node camerav2_410x308_30fps.launch
+roslaunch rplidar_ros rplidar.launch
 rosrun merl_bot ros_node_pi.py
