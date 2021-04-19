@@ -2,6 +2,7 @@
 import time, os, rospy, rosnode, cv2
 from std_msgs.msg import String
 from sensor_msgs.msg import CompressedImage, LaserScan
+from geometry_msgs.msg import PoseStamped
 from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
 import pickle
@@ -40,60 +41,55 @@ def car_callback(data):
     #pass
     print(f"Can't convert to int: {data.data.split(',')}")
 
-# def lidar_callback(data):
-#   global lscan
-#   lscan = data.ranges
+def slam_callback(data):
+  global x, y, slam_rot
+  x = data.pose.position.x
+  y = data.pose.position.y
+  slam_rot = data.pose.orientation.z
+  
 
-#   fig = plt.figure(1)
-#   ax = plt.subplot(111, projection='polar')
-#   line = ax.scatter(np.linspace(0, 360, len(lscan)), lscan, s=5, c=[0, 50],
-#                           cmap=plt.cm.Greys_r, lw=0)
-#   ax.set_rmax(4000)
-#   ax.grid(True)
-
-#   plt.show()
+def lidar_callback(data):
+  global lscan
+  lscan = data.ranges
 
 def laptopNode():
-  global c_angle, c_speed, img, lscan
+  global c_angle, c_speed, img, lscan, x, y, slam_rot
   # controller = PurePursuit() #PurePursuitPlusPID()
-  print("h1")
+
   rospy.init_node('ros_node_laptop')
-  print("h2")
   pub = rospy.Publisher('/NN_angle_speed', String, queue_size=1)
-  print("h2.1")
   img_sub = rospy.Subscriber('/raspicam_node/image/compressed', CompressedImage, img_callback)
-  print("h2.2")
   car_sub = rospy.Subscriber('/car_angle_speed', String, car_callback)
-  # lidar_sub = rospy.Subscriber('/rplidarNode/scan', LaserScan, lidar_callback)
-  print("h3")
+  lidar_sub = rospy.Subscriber('/rplidarNode/scan', LaserScan, lidar_callback)
+  slam_sub = rospy.Subscriber('/slam_out_pose', PoseStamped, slam_callback)
+  
   rate = rospy.Rate(45) # 30 hz
   if TRAINING:
     xbox = Xbox360Controller()
-  print("h4")
+
   while not rospy.is_shutdown():
     if not TRAINING:
-      # img = process_img(img)
-      # # get into correct shape for network
-      # img = img.reshape(1,200,400,3).reshape(1,1,200,400,3) 
-      # prediction = model.predict(img)[0]
-      # # construct line from predicted points, each being one meter apart
-      # trajectory_prediction = np.array([[float(x),prediction[x]] for x in range(len(prediction))]) 
-      # speed, angle = controller.get_control(trajectory_prediction, speed, desired_speed = 25, dt=1./FPS)
-      speed, angle = 0, 0
+      # get into correct shape for network
+      img = img.reshape(1,200,400,3).reshape(1,1,200,400,3) 
+      prediction = model.predict(img)[0]
+      # construct line from predicted points, each being one meter apart
+      trajectory_prediction = np.array([[float(x),prediction[x]] for x in range(len(prediction))]) 
+      speed, angle = controller.get_control(trajectory_prediction, speed, desired_speed = 25, dt=1./FPS)
     else:
       angle = xbox.axis_l.x if abs(xbox.axis_l.x) > 0.15 else 0
-      speed = xbox.trigger_r.value-xbox.trigger_l.value if abs(xbox.trigger_r.value-xbox.trigger_l.value) > 0.075 else 0
+      speed = ( xbox.trigger_r.value-xbox.trigger_l.value ) / 4 if abs(xbox.trigger_r.value-xbox.trigger_l.value) > 0.075 else 0
       
-      speed = -1* speed / 4
       # with open(f"training_{fname}.p",'a') as ff:
       #   pngname = {datetime.now().strftime('%m_%d_%H_%M_%S')}
       #   data = {"time" : rospy.get_time(), "c_angle" : c_angle, "c_speed" : c_speed, \
+      #            "slam_x" : x, "slam_y": y, "slam_z" : slam_rot \
       #           "lscan" : lscan, "img" : f"raspicam_{pngname}.png"}
       #   cv2.imwrite(f"raspicam_{pngname}.png",img)
       #   pickle.dump(data,ff)
 
     pub.publish(f"{angle},{speed}")
-    print(f"NN Ang: {round(angle,2)}\tNN Vel: {round(speed,2)}\tCar Ang: {round(c_angle,2)}\tCar Vel: {round(c_speed,2)}\tAng Err: {round(c_angle-angle,2)}\tVel Err: {round(c_speed-speed,2)}")
+    print(f"Ang: {round(angle,2)}\tVel: {round(speed,2)}\tC_Ang: {round(c_angle,2)}\tC_Vel: {round(c_speed,2)}\tC_x: {round(x,2)}\tC_y: {round(y,2)}\tC_z: {round(slam_rot,2)}")
+    #Ang Err: {round(c_angle-angle,2)}\tVel Err: {round(c_speed-speed,2)}")
     rate.sleep()
   if TRAINING:
     xbox.close()

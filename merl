@@ -1,0 +1,19 @@
+#!/bin/bash
+ 
+IP=$(hostname -I | awk '{print $1}') #10.42.0.59 
+export ROS_IP=$IP
+
+gnome-terminal --tab --execute='export ROS_IP=$IP; roscore'
+sleep 1
+gnome-terminal --tab --execute='export ROS_IP=$IP; rosrun merl_bot laptop.py'
+# roslaunch hector_slam_mapping tutorial.launch
+
+# #!/bin/bash
+
+
+# export ROS_MASTER_URI=http://psimmerl:11311
+# export ROS_IP=$(hostname -I | awk '{print $1}') #10.42.0.1
+
+# roslaunch raspicam_node camerav2_410x308_30fps.launch
+# roslaunch rplidar_ros rplidar.launch
+# rosrun merl_bot ros_node_pi.py

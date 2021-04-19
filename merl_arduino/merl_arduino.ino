@@ -81,11 +81,10 @@ void loop() {
       yaw = mymap(yaw, 0, 180, 0, 2);//car turned 90 right is -1
     }
     //pitch = (double) event.orientation.y; roll = (double) event.orientation.z; 
-    yaw = -yaw;
   }
   
-  if ((millis() - prevEncTime) >= 20) {
-    speed = ((countLeft+countRight-prevCount)/2)/(millis()-prevEncTime);
+  if ((millis() - prevEncTime) >= 50) {
+    //speed = ((countLeft+countRight-prevCount)/2*(3.14159*8.75)/8)/((millis()-prevEncTime)/1000); // cm/s
     prevCount=countLeft+countRight;
     prevEncTime = millis();
   }
@@ -99,7 +98,7 @@ void loop() {
       String s_angleIn = readString.substring(0, ind);   //captures first data String
       String s_speedIn = readString.substring(ind+1);   //captures second data String
       angleIn = mymap(s_angleIn.toFloat(), -1, 1, 2000, 1000);
-      speedIn = mymap(s_speedIn.toFloat(), -1, 1, 2000, 1000);
+      speedIn = mymap(-1 * s_speedIn.toFloat(), -1, 1, 2000, 1000);
 
       steering.writeMicroseconds(angleIn);
       throttle.writeMicroseconds(speedIn);
