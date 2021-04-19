@@ -53,7 +53,7 @@ def piNode():
       # steeringPID.set_point = angle
       # angleAdj = steeringPID.get_control(c_angle, 1/FPS)
 
-      ser.write("!{4.2f},{4.2f}*".format(angle,speed).encode('utf-8'))
+      ser.write("!{:4.2f},{:4.2f}*".format(angle,speed).encode('utf-8'))
     else:
       print("Laptop node does not exist! Stopping Robot!")
       ser.write('!0.00,0.00*'.encode('utf-8'))

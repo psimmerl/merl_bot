@@ -113,10 +113,9 @@ void loop() {
     c = Serial.read();  //gets one byte from serial buffer
     
     if (c == '*') {
-      // readString = ;
-      ind = readString.indexOf(',');  //finds location of first
-      speed = -1*String(inputBuffer).substring(0, ind).toFloat();   //captures first data String
-      angle = String(inputBuffer).substring(ind+1).toFloat();   //captures second data String
+      ind = String(inputBuffer).indexOf(',');  //finds location of first
+      angle = String(inputBuffer).substring(0, ind).toFloat();   //captures first data String
+      speed = -1*String(inputBuffer).substring(ind+1).toFloat();   //captures second data String
       angleIn = mymap(angle, -1, 1, 2000, 1000);
       speedIn = mymap(speed, -1, 1, 2000, 1000);
 
@@ -125,7 +124,7 @@ void loop() {
 
       Serial.print(String(angleIn)+","+String(speedIn)+","+String(countLeft)+","+String(countRight)+","+String(yaw)+","+String(speed)+"*");
       rec = false;
-      inputBuffer = "0.00,0.00*";
+      //inputBuffer = "0.00,0.00*";
       // readString=""; //clears variable for new input
     } 
     else {     
