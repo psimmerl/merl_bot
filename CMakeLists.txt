@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   sensor_msgs
   std_msgs
+  geometry_msgs
   cv_bridge
   rosnode
 )
@@ -162,7 +163,7 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  scripts/laptop.py scripts/pi.py
+  scripts/laptop.py scripts/pi.py scripts/record.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

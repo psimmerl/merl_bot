@@ -19,19 +19,20 @@ from xbox360controller import Xbox360Controller
 '''ROS node for the laptop'''
 
 TRAINING = True
-fname = datetime.now().strftime('%m_%d_%H_%M')
+# fname = datetime.now().strftime('%m_%d_%H_%M_%S')
 
 c_angle, c_speed, img, lscan = 0, 0, None, None
+x, y, slam_rot = 0, 0, 0
 
 def img_callback(data):
   global img
   br = CvBridge()
   try:
-    img = cv2.rotate(br.compressed_imgmsg_to_cv2(data, "bgr8"), cv2.ROTATE_180)
+    img = br.compressed_imgmsg_to_cv2(data, "bgr8")#cv2.rotate(br.compressed_imgmsg_to_cv2(data, "bgr8"), cv2.ROTATE_180)
   except CvBridgeError as e:
     print(e)
-  # cv2.imshow('raspicam', img)
-  # cv2.waitKey(1)
+  cv2.imshow('raspicam', img)
+  cv2.waitKey(1)
 
 def car_callback(data):
   global c_angle, c_speed
@@ -63,9 +64,10 @@ def laptopNode():
   lidar_sub = rospy.Subscriber('/rplidarNode/scan', LaserScan, lidar_callback)
   slam_sub = rospy.Subscriber('/slam_out_pose', PoseStamped, slam_callback)
   
-  rate = rospy.Rate(45) # 30 hz
+  rate = rospy.Rate(60) # 30 hz
   if TRAINING:
     xbox = Xbox360Controller()
+    # ff = open(f"train/training_{fname}.p",'wb')
 
   while not rospy.is_shutdown():
     if not TRAINING:
@@ -73,19 +75,19 @@ def laptopNode():
       img = img.reshape(1,200,400,3).reshape(1,1,200,400,3) 
       prediction = model.predict(img)[0]
       # construct line from predicted points, each being one meter apart
-      trajectory_prediction = np.array([[float(x),prediction[x]] for x in range(len(prediction))]) 
+      trajectory_prediction = np.array([[float(i),prediction[i]] for i in range(len(prediction))]) 
       speed, angle = controller.get_control(trajectory_prediction, speed, desired_speed = 25, dt=1./FPS)
     else:
       angle = xbox.axis_l.x if abs(xbox.axis_l.x) > 0.15 else 0
       speed = ( xbox.trigger_r.value-xbox.trigger_l.value ) / 4 if abs(xbox.trigger_r.value-xbox.trigger_l.value) > 0.075 else 0
       
-      # with open(f"training_{fname}.p",'a') as ff:
-      #   pngname = {datetime.now().strftime('%m_%d_%H_%M_%S')}
+      # if img is not None:
+      #   pngname = datetime.now().strftime('%m_%d_%H_%M_%S.%f%')[:-3]
       #   data = {"time" : rospy.get_time(), "c_angle" : c_angle, "c_speed" : c_speed, \
-      #            "slam_x" : x, "slam_y": y, "slam_z" : slam_rot \
+      #           "slam_x" : x, "slam_y": y, "slam_rot" : slam_rot, \
       #           "lscan" : lscan, "img" : f"raspicam_{pngname}.png"}
-      #   cv2.imwrite(f"raspicam_{pngname}.png",img)
-      #   pickle.dump(data,ff)
+      #   cv2.imwrite(f"train/raspicam_{pngname}.png",img)
+      #   pickle.dump(String(data),ff)
 
     pub.publish(f"{angle},{speed}")
     print(f"Ang: {round(angle,2)}\tVel: {round(speed,2)}\tC_Ang: {round(c_angle,2)}\tC_Vel: {round(c_speed,2)}\tC_x: {round(x,2)}\tC_y: {round(y,2)}\tC_z: {round(slam_rot,2)}")
@@ -93,6 +95,7 @@ def laptopNode():
     rate.sleep()
   if TRAINING:
     xbox.close()
+    # ff.close()
   
 if __name__ == '__main__':
   print("Starting MERL Bot Laptop Node")

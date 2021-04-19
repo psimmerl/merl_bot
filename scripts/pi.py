@@ -9,9 +9,9 @@ from std_msgs.msg import String
 '''
 
 ARDUINO_PORT = glob('/dev/ttyACM*')[0]
-ARDUINO_BAUD_RATE = 9600
+ARDUINO_BAUD_RATE = 115200
 SERIAL_TIMEOUT = 0.01
-FPS  = 15
+FPS  = 30
 
 angle, speed = 0, 0
 
@@ -53,10 +53,10 @@ def piNode():
       # steeringPID.set_point = angle
       # angleAdj = steeringPID.get_control(c_angle, 1/FPS)
 
-      ser.write("{},{}*".format(angle,speed).encode('utf-8'))
+      ser.write("!{4.2f},{4.2f}*".format(angle,speed).encode('utf-8'))
     else:
       print("Laptop node does not exist! Stopping Robot!")
-      ser.write('0,0*'.encode('utf-8'))
+      ser.write('!0.00,0.00*'.encode('utf-8'))
 
     rate.sleep()
 
